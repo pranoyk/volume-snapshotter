@@ -1,4 +1,4 @@
-module github.com/pranoyl/volume-snapshotter
+module github.com/pranoyk/volume-snapshotter
 
 go 1.20
 
