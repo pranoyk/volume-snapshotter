@@ -8,10 +8,10 @@ metadata:
 spec:
   group: pranoykundu.dev
   names:
-    kind: SnapshotActions
-    listKind: SnapshotActionsList
+    kind: SnapshotAction
+    listKind: SnapshotActionList
     plural: snapshotactions
-    singular: snapshotactions
+    singular: snapshotaction
   scope: Namespaced
   versions:
   - name: v1

@@ -24,8 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// SnapshotActionses returns a SnapshotActionsInformer.
-	SnapshotActionses() SnapshotActionsInformer
+	// SnapshotActions returns a SnapshotActionInformer.
+	SnapshotActions() SnapshotActionInformer
 }
 
 type version struct {
@@ -39,7 +39,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// SnapshotActionses returns a SnapshotActionsInformer.
-func (v *version) SnapshotActionses() SnapshotActionsInformer {
-	return &snapshotActionsInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// SnapshotActions returns a SnapshotActionInformer.
+func (v *version) SnapshotActions() SnapshotActionInformer {
+	return &snapshotActionInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

@@ -28,7 +28,7 @@ import (
 
 type PranoykunduV1Interface interface {
 	RESTClient() rest.Interface
-	SnapshotActionsesGetter
+	SnapshotActionsGetter
 }
 
 // PranoykunduV1Client is used to interact with features provided by the pranoykundu.dev group.
@@ -36,8 +36,8 @@ type PranoykunduV1Client struct {
 	restClient rest.Interface
 }
 
-func (c *PranoykunduV1Client) SnapshotActionses(namespace string) SnapshotActionsInterface {
-	return newSnapshotActionses(c, namespace)
+func (c *PranoykunduV1Client) SnapshotActions(namespace string) SnapshotActionInterface {
+	return newSnapshotActions(c, namespace)
 }
 
 // NewForConfig creates a new PranoykunduV1Client for the given config.

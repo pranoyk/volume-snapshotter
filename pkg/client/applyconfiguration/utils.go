@@ -29,10 +29,10 @@ import (
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
 	// Group=pranoykundu.dev, Version=v1
-	case v1.SchemeGroupVersion.WithKind("SnapshotActions"):
-		return &pranoykundudevv1.SnapshotActionsApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("SnapshotActionsSpec"):
-		return &pranoykundudevv1.SnapshotActionsSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("SnapshotAction"):
+		return &pranoykundudevv1.SnapshotActionApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("SnapshotActionSpec"):
+		return &pranoykundudevv1.SnapshotActionSpecApplyConfiguration{}
 
 	}
 	return nil

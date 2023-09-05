@@ -18,10 +18,10 @@ limitations under the License.
 
 package v1
 
-// SnapshotActionsListerExpansion allows custom methods to be added to
-// SnapshotActionsLister.
-type SnapshotActionsListerExpansion interface{}
+// SnapshotActionListerExpansion allows custom methods to be added to
+// SnapshotActionLister.
+type SnapshotActionListerExpansion interface{}
 
-// SnapshotActionsNamespaceListerExpansion allows custom methods to be added to
-// SnapshotActionsNamespaceLister.
-type SnapshotActionsNamespaceListerExpansion interface{}
+// SnapshotActionNamespaceListerExpansion allows custom methods to be added to
+// SnapshotActionNamespaceLister.
+type SnapshotActionNamespaceListerExpansion interface{}

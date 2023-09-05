@@ -28,8 +28,8 @@ type FakePranoykunduV1 struct {
 	*testing.Fake
 }
 
-func (c *FakePranoykunduV1) SnapshotActionses(namespace string) v1.SnapshotActionsInterface {
-	return &FakeSnapshotActionses{c, namespace}
+func (c *FakePranoykunduV1) SnapshotActions(namespace string) v1.SnapshotActionInterface {
+	return &FakeSnapshotActions{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

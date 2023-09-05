@@ -7,14 +7,14 @@ import (
 // +genclient
 // +genclient:noStatus
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type SnapshotActions struct {
+type SnapshotAction struct {
 	metav1.TypeMeta  `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SnapshotActionsSpec  `json:"spec"`
+	Spec   SnapshotActionSpec  `json:"spec"`
 }
 
-type SnapshotActionsSpec struct {
+type SnapshotActionSpec struct {
 	Action         string `json:"action"`
 	SnapshotName   string `json:"snapshotName"`
 	SourcePVC      string `json:"sourcePVC"`
@@ -22,9 +22,9 @@ type SnapshotActionsSpec struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type SnapshotActionsList struct {
+type SnapshotActionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 
-	Items []SnapshotActions `json:"items"`
+	Items []SnapshotAction `json:"items"`
 }
