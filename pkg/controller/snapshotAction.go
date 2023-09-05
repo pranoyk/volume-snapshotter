@@ -12,6 +12,7 @@ import (
 	klientset "github.com/pranoyk/volume-snapshotter/pkg/client/clientset/versioned"
 	kinf "github.com/pranoyk/volume-snapshotter/pkg/client/informers/externalversions/pranoykundu.dev/v1"
 	klister "github.com/pranoyk/volume-snapshotter/pkg/client/listers/pranoykundu.dev/v1"
+	"github.com/pranoyk/volume-snapshotter/pkg/apis/pranoykundu.dev/v1"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -93,56 +94,70 @@ func (c *Controller) processNextItem() bool {
 		return false
 	}
 
-	if sa.Spec.Action == "createPVC" {
-		apiGroup := "snapshot.storage.k8s.io"
-		pvc := &corev1.PersistentVolumeClaim{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: sa.Spec.DestinationPVC,
-			},
-			Spec: corev1.PersistentVolumeClaimSpec{
-				StorageClassName: &storageClassName,
-				DataSource: &corev1.TypedLocalObjectReference{
-					Name:     sa.Spec.SnapshotName,
-					Kind:     "VolumeSnapshot",
-					APIGroup: &apiGroup,
+	switch sa.Spec.Action {
+	case "createPVC":
+		{
+			apiGroup := "snapshot.storage.k8s.io"
+			pvc := &corev1.PersistentVolumeClaim{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: sa.Spec.DestinationPVC,
 				},
-				Resources: corev1.ResourceRequirements{
-					Requests: corev1.ResourceList{
-						corev1.ResourceStorage: resource.MustParse("1Gi"),
+				Spec: corev1.PersistentVolumeClaimSpec{
+					StorageClassName: &storageClassName,
+					DataSource: &corev1.TypedLocalObjectReference{
+						Name:     sa.Spec.SnapshotName,
+						Kind:     "VolumeSnapshot",
+						APIGroup: &apiGroup,
+					},
+					Resources: corev1.ResourceRequirements{
+						Requests: corev1.ResourceList{
+							corev1.ResourceStorage: resource.MustParse("1Gi"),
+						},
+					},
+					AccessModes: []corev1.PersistentVolumeAccessMode{
+						corev1.ReadWriteOnce,
 					},
 				},
-				AccessModes: []corev1.PersistentVolumeAccessMode{
-					corev1.ReadWriteOnce,
-				},
-			},
-		}
+			}
 
-		_, err := c.clientset.CoreV1().PersistentVolumeClaims(sa.Namespace).Create(context.Background(), pvc, metav1.CreateOptions{})
-		if err != nil {
-			fmt.Printf("error creating pvc for snapshot action %s, error: %s\n", sa.Name, err.Error())
-			return false
+			_, err := c.clientset.CoreV1().PersistentVolumeClaims(sa.Namespace).Create(context.Background(), pvc, metav1.CreateOptions{})
+			if err != nil {
+				fmt.Printf("error creating pvc for snapshot action %s, error: %s\n", sa.Name, err.Error())
+				return false
+			}
 		}
-	}
-	if sa.Spec.Action == "takeSnapshot" {
-		snapshot := &snapshotsv1.VolumeSnapshot{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: sa.Spec.SnapshotName,
-			},
-			Spec: snapshotsv1.VolumeSnapshotSpec{
-				VolumeSnapshotClassName: &snapshotClassName,
-				Source: snapshotsv1.VolumeSnapshotSource{
-					PersistentVolumeClaimName: &sa.Spec.SourcePVC,
+	case "takeSnapshot":
+		{
+			snapshot := &snapshotsv1.VolumeSnapshot{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: sa.Spec.SnapshotName,
 				},
-			},
+				Spec: snapshotsv1.VolumeSnapshotSpec{
+					VolumeSnapshotClassName: &snapshotClassName,
+					Source: snapshotsv1.VolumeSnapshotSource{
+						PersistentVolumeClaimName: &sa.Spec.SourcePVC,
+					},
+				},
+			}
+			_, err := c.snapshotClient.SnapshotV1().VolumeSnapshots(sa.Namespace).Create(context.TODO(), snapshot, metav1.CreateOptions{})
+			if err != nil {
+				fmt.Printf("error creating snapshot for snapshot action %s, error: %s\n", sa.Name, err.Error())
+				return false
+			}
 		}
-		_, err := c.snapshotClient.SnapshotV1().VolumeSnapshots(sa.Namespace).Create(context.TODO(), snapshot, metav1.CreateOptions{})
-		if err != nil {
-			fmt.Printf("error creating snapshot for snapshot action %s, error: %s\n", sa.Name, err.Error())
-			return false
-		}
+	default:
+		fmt.Printf("invalid action %s deleting SnapshotAction\n", sa.Spec.Action)
+		c.deleteSA(sa)
 	}
 	fmt.Printf("snapshot action %s\n", sa.Name)
 	return true
+}
+
+func (c *Controller) deleteSA(sa *v1.SnapshotAction) {
+	err := c.saClient.PranoykunduV1().SnapshotActions(sa.Namespace).Delete(context.Background(), sa.Name, metav1.DeleteOptions{})
+	if err != nil {
+		fmt.Printf("error deleting snapshot action %s, error: %s\n", sa.Name, err.Error())
+	}
 }
 
 func (c *Controller) handleAdd(obj interface{}) {

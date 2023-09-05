@@ -60,5 +60,4 @@ func main() {
 	if err := c.Run(ch); err != nil {
 		log.Printf("error running controller %s\n", err.Error())
 	}
-
 }
