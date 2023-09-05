@@ -1,18 +1,19 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"fmt"
 	"log"
 	"path/filepath"
+	"time"
 
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-	
+
 	klient "github.com/pranoyk/volume-snapshotter/pkg/client/clientset/versioned"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	saInfFac "github.com/pranoyk/volume-snapshotter/pkg/client/informers/externalversions"
+	"github.com/pranoyk/volume-snapshotter/pkg/controller"
 )
 
 func main() {
@@ -39,10 +40,18 @@ func main() {
 		log.Printf("getting klient set %s\n", err.Error())
 	}
 
-	snapshotActions, err := klientset.PranoykunduV1().SnapshotActions("").List(context.Background(), metav1.ListOptions{})
+	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Printf("error listing snapshot actions %s\n", err.Error())
+		log.Printf("getting std client %s\n", err.Error())
 	}
 
-	fmt.Printf("length of snapshot actions %d\n", len(snapshotActions.Items))
+	infoFactory := saInfFac.NewSharedInformerFactory(klientset, 10*time.Minute)
+	ch := make(chan struct{})
+	c := controller.NewController(client, klientset, infoFactory.Pranoykundu().V1().SnapshotActions())
+
+	infoFactory.Start(ch)
+	if err := c.Run(ch); err != nil {
+		log.Printf("error running controller %s\n", err.Error())
+	}
+
 }
