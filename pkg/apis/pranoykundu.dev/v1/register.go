@@ -25,7 +25,7 @@ func init() {
 }
 
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion, &SnapshotActions{})
+	scheme.AddKnownTypes(SchemeGroupVersion, &SnapshotActions{}, &SnapshotActionsList{})
 
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

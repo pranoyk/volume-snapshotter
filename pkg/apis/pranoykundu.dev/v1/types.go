@@ -5,24 +5,26 @@ import (
 )
 
 // +genclient
+// +genclient:noStatus
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Progress",type=string,JSONPath=`.status.progress`
 type SnapshotActions struct {
-	metav1.TypeMeta
-	metav1.ObjectMeta
+	metav1.TypeMeta  `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SnapshotActionsSpec
-	Status SnapshotActionsStatus
+	Spec   SnapshotActionsSpec  `json:"spec"`
 }
 
 type SnapshotActionsSpec struct {
-	Action         string
-	SnapshotName   string
-	SourcePVC      string
-	DestinationPVC string
+	Action         string `json:"action"`
+	SnapshotName   string `json:"snapshotName"`
+	SourcePVC      string `json:"sourcePVC"`
+	DestinationPVC string `json:"destinationPVC"`
 }
 
-type SnapshotActionsStatus struct {
-	Progress string
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+type SnapshotActionsList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+
+	Items []SnapshotActions `json:"items"`
 }
