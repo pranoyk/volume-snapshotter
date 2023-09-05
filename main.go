@@ -14,6 +14,8 @@ import (
 	klient "github.com/pranoyk/volume-snapshotter/pkg/client/clientset/versioned"
 	saInfFac "github.com/pranoyk/volume-snapshotter/pkg/client/informers/externalversions"
 	"github.com/pranoyk/volume-snapshotter/pkg/controller"
+
+	snapshotclientset "github.com/kubernetes-csi/external-snapshotter/client/v4/clientset/versioned"
 )
 
 func main() {
@@ -45,9 +47,14 @@ func main() {
 		log.Printf("getting std client %s\n", err.Error())
 	}
 
+	snapshotClient, err := snapshotclientset.NewForConfig(config)
+	if err != nil {
+		log.Fatalf("Error creating snapshot client: %v", err)
+	}
+
 	infoFactory := saInfFac.NewSharedInformerFactory(klientset, 10*time.Minute)
 	ch := make(chan struct{})
-	c := controller.NewController(client, klientset, infoFactory.Pranoykundu().V1().SnapshotActions())
+	c := controller.NewController(client, *snapshotClient, klientset, infoFactory.Pranoykundu().V1().SnapshotActions())
 
 	infoFactory.Start(ch)
 	if err := c.Run(ch); err != nil {

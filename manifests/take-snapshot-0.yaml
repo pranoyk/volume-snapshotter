@@ -1,0 +1,8 @@
+apiVersion: pranoykundu.dev/v1
+kind: SnapshotAction
+metadata:
+  name: take-snapshot-0
+spec:
+  action: takeSnapshot
+  snapshotName: mysql-snapshot-1
+  sourcePVC: mysql-pvc

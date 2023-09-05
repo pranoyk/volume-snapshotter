@@ -42,9 +42,7 @@ spec:
                 type: string
             required:
             - action
-            - destinationPVC
             - snapshotName
-            - sourcePVC
             type: object
         required:
         - spec
